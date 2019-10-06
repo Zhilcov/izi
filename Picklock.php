@@ -58,7 +58,7 @@ class Picklock implements PicklockInterface
 
     public function unlock(Lock $lock){
         $start = microtime(true);
-        for ($i = 2; $i <= 4; $i++) {
+        for ($i = self::minSymbols; $i <= self::maxSymbols; $i++) {
             $all_cumbinations = $this->brud_force($i,$this->symbols);
 
             foreach ($all_cumbinations as $password) {
