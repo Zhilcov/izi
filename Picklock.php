@@ -29,7 +29,12 @@ class Picklock implements PicklockInterface
 			'password' => NULL,
 			'millisecondsToUnlock' => 0,
 			'falseAttempt' => 0
-		)
+		),
+        'my_lock' => array(
+			'password' => NULL,
+			'millisecondsToUnlock' => 0,
+			'falseAttempt' => 0
+		),
 	);
 
 	const minSymbols = 2;	// hint
