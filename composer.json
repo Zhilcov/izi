@@ -1,0 +1,11 @@
+{
+    "name": "vendor/izi",
+    "require": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Izi\\": "../izi"
+        }
+    }
+}
