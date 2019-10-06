@@ -36,15 +36,10 @@ class Picklock implements PicklockInterface
 	const maxSymbols = 4;	// hint
 
 	private $symbols = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'õ', 'ä', 'ö', 'ü', 'x', 'y'); // see on kolmas ja viimane vihje
-    /**
-     * @var array
-     */
 
-    public function unlock(Lock $lock){
-        $array_elems_to_combine = $this->symbols;
-        $size = 3;
+
+    public function brud_force ($size = 2, $array_elems_to_combine = array('a', 'b', 'c')){
         $current_set = array('');
-
         for ($i = 0; $i < $size; $i++) {
             $tmp_set = array();
             foreach ($current_set as $curr_elem) {
@@ -54,22 +49,58 @@ class Picklock implements PicklockInterface
             }
             $current_set = $tmp_set;
         }
+        return $current_set;
+    }
 
-        foreach ($current_set as $item) {
-            if ($lock->open($item)) {
-                echo "password:  ".$item ;
+    /**
+     * @var array
+     */
+
+    public function unlock(Lock $lock){
+        $start = microtime(true);
+        for ($i = 2; $i <= 4; $i++) {
+            $all_cumbinations = $this->brud_force($i,$this->symbols);
+
+            foreach ($all_cumbinations as $password) {
+                if ($lock->open($password)){
+                    self::$locks[$lock->getOwnClass()] = [
+                        'password' => $password,
+                        'millisecondsToUnlock' => round(microtime(true) - $start, 4)*1000,
+                        'falseAttempt' =>$lock->falseAttempts
+                    ];
+                    return;
+                }
             }
         }
+
+
     }
 
     public function unlockAllLocks(){
-
+        foreach (array_keys(self::$locks) as $class_name) {
+            $firsUpper = "Izi\Locks\\".ucfirst($class_name);
+            $obj = new $firsUpper;
+            $this->unlock($obj);
+        }
     }
 
     /**
     Use this method to var_dump variable $locks
      */
     public function varDumpLockResults(){
-        return self::$locks;
+        echo '<dl>';
+        foreach (self::$locks as $key => $value) {
+            echo '<dt>' .$key. '</dt>';
+            echo '</dd>';
+                echo '<ul type="square">';
+                    foreach ($value as $key =>$item) {
+                            echo '<li>';
+                                echo  $key.': '. $item ;
+                            echo '</li>';
+                    }
+                echo '</ul>';
+            echo '</dd>';
+        }
+        echo '</dl>';
     }
 }
